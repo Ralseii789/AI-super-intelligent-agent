@@ -62,6 +62,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--spring ai alibaba  https://java2ai.com/docs/overview-->
+        <dependency>
+            <groupId>com.alibaba.cloud.ai</groupId>
+            <artifactId>spring-ai-alibaba-starter</artifactId>
+            <version>1.0.0-M6.1</version>
+        </dependency>
     </dependencies>
 
     <build>
