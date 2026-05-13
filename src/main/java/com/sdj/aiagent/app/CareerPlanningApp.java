@@ -2,6 +2,7 @@ package com.sdj.aiagent.app;
 
 import com.sdj.aiagent.advisor.MyLoggerAdvisor;
 import com.sdj.aiagent.advisor.ReReadingAdvisor;
+import com.sdj.aiagent.chatmemory.FileBasedChatMemory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -40,10 +41,13 @@ public class CareerPlanningApp {
      * @param builder
      */
     public CareerPlanningApp(ChatClient.Builder builder){
-        InMemoryChatMemory inMemoryChatMemory = new InMemoryChatMemory();
+        //初始化基于文件的对话记忆
+        String fileDir = System.getProperty("user.dir")+"/tmp/chat-memory";
+        FileBasedChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+        //InMemoryChatMemory chatMemory = new InMemoryChatMemory();
         this.chatClient = builder.
                 defaultAdvisors(
-                        new MessageChatMemoryAdvisor(inMemoryChatMemory),
+                        new MessageChatMemoryAdvisor(chatMemory),
                         //自定义日志Advisor 可按需开启
                         new MyLoggerAdvisor()
                         //自定义推理增强Advisor 可按需开启
