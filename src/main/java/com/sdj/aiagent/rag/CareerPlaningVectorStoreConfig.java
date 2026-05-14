@@ -20,11 +20,11 @@ public class CareerPlaningVectorStoreConfig {
     @Resource
     private CareerPlaningDocumentLoader careerPlaningDocumentLoader;
 
-    @Bean
-    VectorStore careerVectorStroe(EmbeddingModel embeddingModel){
-        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(embeddingModel).build();
-        List<Document> documents = careerPlaningDocumentLoader.loadMarkdowns();
-        simpleVectorStore.add(documents);
-        return simpleVectorStore;
-    }
+//    @Bean
+//    VectorStore careerVectorStroe(EmbeddingModel dashscopeEmbeddingModel){
+//        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
+//        List<Document> documents = careerPlaningDocumentLoader.loadMarkdowns();
+//        simpleVectorStore.add(documents);
+//        return simpleVectorStore;
+//    }
 }

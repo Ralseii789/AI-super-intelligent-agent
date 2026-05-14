@@ -29,11 +29,15 @@ public class CareerPlanningApp {
     private final ChatClient chatClient;
 
     //RAG知识库
-    @Resource
-    private VectorStore careerVectorStroe;
+//    @Resource
+//    private VectorStore careerVectorStroe;
+
+//    @Resource
+//    private Advisor careerPlanningRagCloudAdvisor;
 
     @Resource
-    private Advisor careerPlanningRagCloudAdvisor;
+    private VectorStore pgVectorVectorStore;
+
     /**
      * 系统预设
      */
@@ -118,7 +122,9 @@ public class CareerPlanningApp {
                 //应用RAG知识库进行问答
                 //.advisors(new QuestionAnswerAdvisor(careerVectorStroe))
                 //检索增强服务
-                .advisors(careerPlanningRagCloudAdvisor)
+                //.advisors(careerPlanningRagCloudAdvisor)
+                //基于PGvector的检索增强服务
+                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
