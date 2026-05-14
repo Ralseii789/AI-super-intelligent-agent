@@ -3,15 +3,19 @@ package com.sdj.aiagent.chatmemory;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
+import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.*;
+import org.springframework.ai.model.Media;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,9 +29,26 @@ public class FileBasedChatMemory implements ChatMemory {
     private static final Kryo kryo = new Kryo();
 
     static {
+        // 关闭强制注册，允许序列化任意类
         kryo.setRegistrationRequired(false);
-        //设置实例化策略
-        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+        // 实例化策略：当对象没有无参构造时，使用 objenesis 创建实例
+        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        // 使用 CompatibleFieldSerializer，它按字段名和类名读写，兼容性极好
+        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+        // 可选：关闭警告，因为未注册类会被自动处理，不再提示
+        kryo.setWarnUnregisteredClasses(false);
+
+        // 以下注册仍可保留，以提高序列化效率（有注册的类会使用紧凑ID，未注册的用类名）
+        kryo.register(ArrayList.class);
+        kryo.register(HashMap.class);
+        kryo.register(byte[].class);
+        kryo.register(UserMessage.class);
+        kryo.register(AssistantMessage.class);
+        kryo.register(SystemMessage.class);
+        kryo.register(ToolResponseMessage.class);
+        kryo.register(Media.class);
+        kryo.register(Media.Builder.class);
+        kryo.register(MessageType.class);
     }
 
     //构造对象时，指定文件保存目录
@@ -40,14 +61,14 @@ public class FileBasedChatMemory implements ChatMemory {
     }
     @Override
     public void add(String conversationId, Message message) {
-        saveConversation(conversationId,List.of(message));
+        saveConversation(conversationId,new ArrayList<>(List.of(message)));
 
     }
 
     @Override
     public void add(String conversationId, List<Message> messages) {
         List<Message> messageList = getOrCreateConversation(conversationId);
-        messageList.addAll(messages);
+        messageList.addAll(new ArrayList<>(messages));
         saveConversation(conversationId,messageList);
     }
 
@@ -74,7 +95,7 @@ public class FileBasedChatMemory implements ChatMemory {
      */
     private void saveConversation(String conversationId,List<Message> messages){
         File file = getConversationFile(conversationId);
-        try(Output output = new Output(new FileOutputStream(BASE_DIR))){
+        try(Output output = new Output(new FileOutputStream(file))){
             kryo.writeObject(output,messages);
         }catch (IOException e){
             e.printStackTrace();

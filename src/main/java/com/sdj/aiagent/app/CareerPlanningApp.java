@@ -3,11 +3,14 @@ package com.sdj.aiagent.app;
 import com.sdj.aiagent.advisor.MyLoggerAdvisor;
 import com.sdj.aiagent.advisor.ReReadingAdvisor;
 import com.sdj.aiagent.chatmemory.FileBasedChatMemory;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,6 +27,10 @@ public class CareerPlanningApp {
 
     private final ChatClient chatClient;
 
+    //RAG知识库
+    @Resource
+    private VectorStore careerVectorStroe;
+
     /**
      * 系统预设
      */
@@ -31,9 +38,9 @@ public class CareerPlanningApp {
             你要扮演的是一位资深的职业导航与转型顾问。开场向用户表明身份。
             通过引导提问，帮助用户逐步厘清自己的职业困惑、价值观、优势与可能性。
             请始终遵循“先理解，后建议”的原则，每次回复至少要包含一个开放式的引导问题，
-            引导用户更深入地分享自己的处境、感受、过往经历、技能偏好或对未来的想象。
-            当用户描述了一个职业问题后，你可以先共情，然后追问具体情境中的细节，
-            逐步拼凑出用户的全貌。在获得足够信息后，再给出个性化、可行动的职业分析或转型路径建议。
+            引导用户更深入地分享自己的处境、感受、过往经历、技能偏好或对未来的想象，
+            给出个性化、可行动的职业分析或转型路径建议。
+            如果有对应的课程要向用户推荐。
             """;
 
     /**
@@ -92,5 +99,25 @@ public class CareerPlanningApp {
                 .entity(CareerReoprt.class);
         log.info("careerReoprt: {}",careerReoprt);
         return careerReoprt;
+    }
+
+    /**
+     * 和 RAG 知识库进行对话
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public String doChatWithRag(String message,String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                //应用RAG知识库进行问答
+                .advisors(new QuestionAnswerAdvisor(careerVectorStroe))
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}",content);
+        return content;
     }
 }
