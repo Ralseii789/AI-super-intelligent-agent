@@ -36,11 +36,13 @@ public class CareerPlaningDocumentLoader {
             Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
             for (Resource resource : resources) {
                 String filename = resource.getFilename();
+                String status = filename.substring(filename.length()-6,filename.length()-4);
                 MarkdownDocumentReaderConfig markdownDocumentReaderConfig = MarkdownDocumentReaderConfig.builder()
                         .withHorizontalRuleCreateDocument(true)
                         .withIncludeBlockquote(false)
                         .withIncludeCodeBlock(false)
                         .withAdditionalMetadata("filename", filename)
+                        .withAdditionalMetadata("status",status)
                         .build();
                 MarkdownDocumentReader markdownDocumentReader = new MarkdownDocumentReader(resource, markdownDocumentReaderConfig);
                 List<Document> documents = markdownDocumentReader.get();

@@ -20,11 +20,22 @@ public class CareerPlaningVectorStoreConfig {
     @Resource
     private CareerPlaningDocumentLoader careerPlaningDocumentLoader;
 
-//    @Bean
-//    VectorStore careerVectorStroe(EmbeddingModel dashscopeEmbeddingModel){
-//        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
-//        List<Document> documents = careerPlaningDocumentLoader.loadMarkdowns();
-//        simpleVectorStore.add(documents);
-//        return simpleVectorStore;
-//    }
+    @Resource
+    private MyTokenTextSplitter myTokenTextSplitter;
+
+    @Resource
+    private MyKeywordEnricher myKeywordEnricher;
+
+    @Bean
+    VectorStore careerVectorStroe(EmbeddingModel dashscopeEmbeddingModel){
+        SimpleVectorStore simpleVectorStore = SimpleVectorStore.builder(dashscopeEmbeddingModel).build();
+        //加载文档
+        List<Document> documents = careerPlaningDocumentLoader.loadMarkdowns();
+        //自主切分文档
+        //List<Document> splitDocuments = myTokenTextSplitter.splitCustomized(documents);
+        //自动补充关键词元信息
+        List<Document> enrichDocument = myKeywordEnricher.enrichDocument(documents);
+        simpleVectorStore.add(enrichDocument);
+        return simpleVectorStore;
+    }
 }

@@ -7,16 +7,16 @@ spring:
         chat:
           options:
             model: qwen-plus
-      vectorstore:
-        pgvector:
-          index-type: HNSW
-          distance-type: COSINE_DISTANCE
-          dimensions: 1536
-          max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
-  datasource:
-    url: jdbc:postgresql://rm-cn-v8n4s7dv60001bgo.rwlb.rds.aliyuncs.com:5432/shen_ai_agent
-    username: my_user
-    password: ${PgVector_Password}
+#      vectorstore:
+#        pgvector:
+#          index-type: HNSW
+#          distance-type: COSINE_DISTANCE
+#          dimensions: 1536
+#          max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
+#  datasource:
+#    url: jdbc:postgresql://rm-cn-v8n4s7dv60001bgo.rwlb.rds.aliyuncs.com:5432/shen_ai_agent
+#    username: my_user
+#    password: ${PgVector_Password}
 
 springdoc:
   swagger-ui:
@@ -38,3 +38,5 @@ server:
   port: 8512
   servlet:
     context-path: /api
+search-api:
+  api-key: ${SEARCH-API}

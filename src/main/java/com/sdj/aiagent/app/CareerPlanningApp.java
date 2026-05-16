@@ -3,6 +3,9 @@ package com.sdj.aiagent.app;
 import com.sdj.aiagent.advisor.MyLoggerAdvisor;
 import com.sdj.aiagent.advisor.ReReadingAdvisor;
 import com.sdj.aiagent.chatmemory.FileBasedChatMemory;
+import com.sdj.aiagent.rag.CareerRagCustomAdvisorFactory;
+import com.sdj.aiagent.rag.QueryRewriter;
+import com.sdj.aiagent.tools.ToolRegistration;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -11,6 +14,7 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
@@ -29,15 +33,20 @@ public class CareerPlanningApp {
     private final ChatClient chatClient;
 
     //RAG知识库
-//    @Resource
-//    private VectorStore careerVectorStroe;
-
-//    @Resource
-//    private Advisor careerPlanningRagCloudAdvisor;
+    @Resource(name = "careerVectorStroe")
+    private VectorStore careerVectorStroe;
 
     @Resource
-    private VectorStore pgVectorVectorStore;
+    private Advisor careerPlanningRagCloudAdvisor;
 
+//    @Resource
+//    //private VectorStore pgVectorVectorStore;
+
+    @Resource
+    private QueryRewriter queryRewriter;
+
+    @Resource
+    private ToolCallback[] allTools;
     /**
      * 系统预设
      */
@@ -115,16 +124,41 @@ public class CareerPlanningApp {
      * @return
      */
     public String doChatWithRag(String message,String chatId){
+        //查询重写
+        //String doQueryRewrite = queryRewriter.doQueryRewrite(message);
         ChatResponse chatResponse = chatClient.prompt()
                 .user(message)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 //应用RAG知识库进行问答
-                //.advisors(new QuestionAnswerAdvisor(careerVectorStroe))
+                .advisors(new QuestionAnswerAdvisor(careerVectorStroe))
                 //检索增强服务
                 //.advisors(careerPlanningRagCloudAdvisor)
                 //基于PGvector的检索增强服务
-                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                //.advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                //应用自定义RAG检索增强服务（文档查询器+上下文增强器）
+                //.advisors(CareerRagCustomAdvisorFactory.createCareerAppRagCustomAdvisor(careerVectorStroe,"在职"))
+                .call()
+                .chatResponse();
+        String content = chatResponse.getResult().getOutput().getText();
+        log.info("content: {}",content);
+        return content;
+    }
+
+    /**
+     * AI 工具调用
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public String doChatWithTools(String message,String chatId){
+        ChatResponse chatResponse = chatClient.prompt()
+                .user(message)
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                //开启日志，便于观察效果
+                .advisors(new MyLoggerAdvisor())
+                .tools(allTools)
                 .call()
                 .chatResponse();
         String content = chatResponse.getResult().getOutput().getText();
