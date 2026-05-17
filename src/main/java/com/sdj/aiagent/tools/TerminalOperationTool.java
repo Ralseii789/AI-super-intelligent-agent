@@ -1,5 +1,8 @@
 package com.sdj.aiagent.tools;
 
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,8 +12,8 @@ import java.io.InputStreamReader;
  * 终端操作工具
  */
 public class TerminalOperationTool {
-
-    public String executeTerminalCommand(String command){
+    @Tool(description = "Execute a command in the terminal")
+    public String executeTerminalCommand(@ToolParam(description = "Command to execute in the terminal") String command){
         StringBuilder output = new StringBuilder();
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", command);

@@ -4,6 +4,8 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.ai.tool.annotation.ToolParam;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,8 @@ public class WebSearchTool {
         this.apiKey = apiKey;
     }
 
-    public String searchWeb(String query){
+    @Tool(description = "Search for information from Baidu Search Engine")
+    public String searchWeb(@ToolParam(description = "Search query keyword") String query){
         HashMap<String, Object> paramMap = new HashMap<>();
         paramMap.put("q",query);
         paramMap.put("api_key",apiKey);

@@ -4,7 +4,7 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeAgentApi;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
 import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
-import org.springframework.ai.chat.client.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +22,9 @@ public class CareerPlanningRagCloudAdvisorConfig {
 
     @Bean
     public Advisor careerPlanningRagCloudAdvisor(){
-        DashScopeApi dashScopeApi = new DashScopeApi(dashScopeApiKey);
+        DashScopeApi dashScopeApi = DashScopeApi.builder()
+                .apiKey(dashScopeApiKey)
+                .build();
         final String KNOWLEDGE_INDEX = "职业规划导师";
         DashScopeDocumentRetriever dashScopeDocumentRetriever = new DashScopeDocumentRetriever(dashScopeApi,
                 DashScopeDocumentRetrieverOptions.builder()

@@ -8,7 +8,7 @@ import com.esotericsoftware.kryo.util.DefaultInstantiatorStrategy;
 import org.objenesis.strategy.StdInstantiatorStrategy;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.*;
-import org.springframework.ai.model.Media;
+import org.springframework.ai.content.Media;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,26 +29,9 @@ public class FileBasedChatMemory implements ChatMemory {
     private static final Kryo kryo = new Kryo();
 
     static {
-        // 关闭强制注册，允许序列化任意类
         kryo.setRegistrationRequired(false);
-        // 实例化策略：当对象没有无参构造时，使用 objenesis 创建实例
-        kryo.setInstantiatorStrategy(new DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-        // 使用 CompatibleFieldSerializer，它按字段名和类名读写，兼容性极好
-        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-        // 可选：关闭警告，因为未注册类会被自动处理，不再提示
-        kryo.setWarnUnregisteredClasses(false);
-
-        // 以下注册仍可保留，以提高序列化效率（有注册的类会使用紧凑ID，未注册的用类名）
-        kryo.register(ArrayList.class);
-        kryo.register(HashMap.class);
-        kryo.register(byte[].class);
-        kryo.register(UserMessage.class);
-        kryo.register(AssistantMessage.class);
-        kryo.register(SystemMessage.class);
-        kryo.register(ToolResponseMessage.class);
-        kryo.register(Media.class);
-        kryo.register(Media.Builder.class);
-        kryo.register(MessageType.class);
+        // 设置实例化策略
+        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
     }
 
     //构造对象时，指定文件保存目录
@@ -73,11 +56,8 @@ public class FileBasedChatMemory implements ChatMemory {
     }
 
     @Override
-    public List<Message> get(String conversationId, int lastN) {
-        List<Message> messageList = getOrCreateConversation(conversationId);
-        return messageList.stream().
-                skip(Math.max(0,messageList.size()-lastN)).
-                toList();
+    public List<Message> get(String conversationId) {
+        return getOrCreateConversation(conversationId);
     }
 
     @Override

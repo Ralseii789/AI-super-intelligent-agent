@@ -3,7 +3,7 @@ package com.sdj.aiagent.rag;
 import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.transformer.KeywordMetadataEnricher;
+import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
 import org.springframework.stereotype.Component;
 import org.springframework.ai.document.Document;
 import java.util.List;
