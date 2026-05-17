@@ -24,13 +24,15 @@ public class ToolRegistration {
         ResourceDownloadTool resourceDownloadTool = new ResourceDownloadTool();
         PDFGenerationTool pdfGenerationTool = new PDFGenerationTool();
         TerminalOperationTool terminalOperationTool = new TerminalOperationTool();
+        TerminateTool terminateTool = new TerminateTool();
         return ToolCallbacks.from(
                 fileOperationTool,
                 webSearchTool,
                 webScrapingTool,
                 resourceDownloadTool,
                 pdfGenerationTool,
-                terminalOperationTool
+                terminalOperationTool,
+                terminateTool
         );
     }
 }
