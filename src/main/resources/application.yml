@@ -7,12 +7,12 @@ spring:
         chat:
           options:
             model: qwen3-max
-      mcp:
-        client:
-          sse:
-            connections:
-              shen-image-search-mcp-server:
-                url: http://localhost:8127
+#      mcp:
+#        client:
+#          sse:
+#            connections:
+#              shen-image-search-mcp-server:
+#                url: http://localhost:8127
 #          stdio:
 #            servers-configuration: classpath:mcp-servers.json
 #      vectorstore:

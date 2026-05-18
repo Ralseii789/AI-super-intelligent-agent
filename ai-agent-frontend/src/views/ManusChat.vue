@@ -90,24 +90,23 @@ const sendMessage = () => {
   isLoading.value = true
   scrollToBottom()
 
-  // 添加AI消息占位
-  const aiMessageIndex = messages.value.length
-  messages.value.push({
-    role: 'assistant',
-    content: ''
-  })
-
-  // 调用SSE接口
+  // 调用SSE接口 - 每个步骤单独一个气泡
   chatWithManusSSE(
     message,
-    // onMessage
+    // onMessage - 每次SSE响应创建一个新的气泡
     (data) => {
-      messages.value[aiMessageIndex].content += data
+      messages.value.push({
+        role: 'assistant',
+        content: data
+      })
       scrollToBottom()
     },
     // onError
     (error) => {
-      messages.value[aiMessageIndex].content = `错误: ${error}`
+      messages.value.push({
+        role: 'assistant',
+        content: `错误: ${error}`
+      })
       isLoading.value = false
       scrollToBottom()
     },
