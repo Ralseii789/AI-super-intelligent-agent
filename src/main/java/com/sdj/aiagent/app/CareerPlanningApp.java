@@ -111,6 +111,21 @@ public class CareerPlanningApp {
 
     }
 
+    /**
+     * AI 基础对话（支持多轮对话记忆,SSE流式传输）
+     * @param message
+     * @param chatId
+     * @return
+     */
+    public Flux<String> doChatBySSE(String message,String chatId){
+        return chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .stream()
+                .content();
+    }
+
     record CareerReoprt(String title, List<String> suggestions){}
     /**
      * AI 职业规划报告（实战结构化输出）

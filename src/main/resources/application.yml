@@ -6,7 +6,7 @@ spring:
         api-key: ${SPRING_AI_DASHSCOPE_API_KEY}
         chat:
           options:
-            model: qwen3.5-plus
+            model: glm-5.1
       mcp:
         client:
           sse:

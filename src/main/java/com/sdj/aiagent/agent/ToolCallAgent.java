@@ -66,7 +66,7 @@ public class ToolCallAgent extends ReActAgent{
         try {
             ChatResponse chatResponse = getChatClient().prompt(prompt)
                     .system(getSystemPrompt())
-                    .tools(availableTools)
+                    .toolCallbacks(availableTools)
                     .call()
                     .chatResponse();
             //解析工具调用结果，获取要调用的工具
@@ -88,7 +88,7 @@ public class ToolCallAgent extends ReActAgent{
                 return true;
             }
         } catch (Exception e) {
-            log.error(getName()+"的思考过程遇到了问题：",e.getMessage());
+            log.error(getName()+"的思考过程遇到了问题：{}",e.getMessage());
             getMessageList().add(new AssistantMessage("处理时遇到了问题："+e.getMessage()));
             return false;
         }

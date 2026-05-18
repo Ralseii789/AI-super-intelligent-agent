@@ -52,6 +52,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.7.0</version>
+        </dependency>
         <!-- 阿里云百练、灵积大模型服务 -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -128,7 +133,6 @@
             <groupId>com.itextpdf</groupId>
             <artifactId>font-asian</artifactId>
             <version>9.1.0</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
